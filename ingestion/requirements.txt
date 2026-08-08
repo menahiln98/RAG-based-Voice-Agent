@@ -1,0 +1,6 @@
+pdfplumber==0.11.4
+pdf2image==1.17.0
+pytesseract==0.3.13
+requests==2.32.3
+pinecone==5.4.2
+python-dotenv==1.0.1

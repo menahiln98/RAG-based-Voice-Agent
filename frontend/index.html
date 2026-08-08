@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HR Voice Assistant — Pakistan Tech Career + HR Policy</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-microphone"></i></div>
+    <div class="brand-text">
+      <span class="brand-title">HR Voice <span class="accent">Assistant</span></span>
+      <span class="brand-subtitle">Pakistan Tech Career + HR Policy</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="status-dot"></span>
+    <span class="status-text">Vapi.ai connected</span>
+    <span class="badge">Pinecone</span>
+    <span class="badge">Groq</span>
+    <span class="badge">HF API</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <p class="sidebar-label">Mode</p>
+      <button class="mode-btn active" data-mode="hr_policy">HR Policy</button>
+      <button class="mode-btn" data-mode="interview_prep">Interview Prep</button>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label">Knowledge base</p>
+      <div class="kb-item">
+        <span class="kb-dot"></span>
+        <span id="kb-active-label">HR Policy</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label">Domains</p>
+      <div class="domain-list">
+        <div class="domain-card" data-domain="frontend">
+          <p class="domain-title">Frontend</p>
+          <p class="domain-sub">JS, React, CSS, performance</p>
+        </div>
+        <div class="domain-card" data-domain="backend">
+          <p class="domain-title">Backend</p>
+          <p class="domain-sub">APIs, DBs, auth, system design</p>
+        </div>
+        <div class="domain-card" data-domain="aiml">
+          <p class="domain-title">AI / ML</p>
+          <p class="domain-sub">Core ML, deep learning, NLP</p>
+        </div>
+        <div class="domain-card" data-domain="devops">
+          <p class="domain-title">DevOps</p>
+          <p class="domain-sub">CI/CD, containers, IaC</p>
+        </div>
+        <div class="domain-card" data-domain="project_manager">
+          <p class="domain-title">Project Management</p>
+          <p class="domain-sub">Methodology, risk, stakeholders</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-header">
+      <div class="mic-row">
+        <button class="mic-btn" id="mic-btn" aria-label="Hold to speak">
+          <i class="ti ti-microphone"></i>
+        </button>
+        <div class="mic-status">
+          <span class="mic-dots" id="mic-dots">. . . . . . . . . . .</span>
+          <span class="mic-label" id="mic-label">Hold to speak</span>
+        </div>
+      </div>
+      <div class="main-header-right">
+        <div class="header-stat">
+          <span class="header-stat-label">Current mode</span>
+          <span class="header-stat-value" id="current-mode-value">HR Policy</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Voice engine</span>
+          <span class="header-stat-value">Vapi.ai</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chat-area">
+      <div class="chat-row">
+        <div class="chat-avatar"><i class="ti ti-microphone"></i></div>
+        <div class="chat-bubble">
+          Connected via Vapi.ai. You can speak your question or type it below. I will retrieve an answer grounded in your knowledge base — if your question falls outside it, I will tell you directly rather than guess.
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <input type="text" id="text-input" placeholder="Type your HR or interview question..." />
+        <button class="send-btn" id="send-btn" disabled>Send</button>
+      </div>
+      <p class="input-hint">Voice is primary — text input is a fallback. Answers are grounded in the knowledge base; out-of-scope questions are declined, not guessed.</p>
+    </div>
+  </main>
+
+</div>
+
+<button class="help-btn" aria-label="Help"><i class="ti ti-help"></i></button>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
