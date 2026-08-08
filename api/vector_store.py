@@ -17,13 +17,21 @@ from config import (
     EMBEDDING_DIMENSION, TOP_K,
 )
 
-_pc = Pinecone(api_key=PINECONE_API_KEY)
+_pc = None
+
+
+def _get_client():
+    global _pc
+    if _pc is None:
+        _pc = Pinecone(api_key=PINECONE_API_KEY)
+    return _pc
 
 
 def get_or_create_index():
-    existing = [idx["name"] for idx in _pc.list_indexes()]
+    pc = _get_client()
+    existing = [idx["name"] for idx in pc.list_indexes()]
     if PINECONE_INDEX_NAME not in existing:
-        _pc.create_index(
+        pc.create_index(
             name=PINECONE_INDEX_NAME,
             dimension=EMBEDDING_DIMENSION,   # MUST match the embedding model's output dim exactly
             metric="cosine",                 # cosine similarity: standard choice for normalized
@@ -32,7 +40,7 @@ def get_or_create_index():
                                               # matters more than raw distance for semantic search.
             spec=ServerlessSpec(cloud=PINECONE_CLOUD, region=PINECONE_REGION),
         )
-    return _pc.Index(PINECONE_INDEX_NAME)
+    return pc.Index(PINECONE_INDEX_NAME)
 
 
 def upsert_chunks(vectors: list[dict]):
