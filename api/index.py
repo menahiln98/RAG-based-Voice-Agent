@@ -15,6 +15,16 @@ Deploy target: Vercel serverless function (see /api/index.py + vercel.json).
 This file contains the actual app; api/index.py just imports it so Vercel's
 Python runtime can find it in the expected location.
 """
+import sys
+import os
+
+# Vercel's Python runtime doesn't always add this file's own directory to
+# sys.path before importing it, which breaks sibling imports like
+# `from retrieval import retrieve_grounded` below even though this exact
+# same code runs fine locally with uvicorn. Adding it explicitly here
+# fixes that regardless of how Vercel's runtime is configured.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import time
 import uuid
 
