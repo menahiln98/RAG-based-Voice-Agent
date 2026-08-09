@@ -38,12 +38,13 @@ app = FastAPI(title="Pak Tech Career & HR Voice Assistant - Custom LLM Backend")
 
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/")
 def health_check():
     return {"status": "ok"}
 
 
-@app.post("/chat/completions")
-async def chat_completions(request: Request):
+async def _handle_chat_completions(request: Request):
     body = await request.json()
     messages = body.get("messages", [])
 
@@ -74,3 +75,14 @@ async def chat_completions(request: Request):
             }
         ],
     }
+
+
+# Registered under every path variant we've seen Vercel actually route to
+# in practice (bare, with /api prefix, with/without trailing slash) --
+# Vercel's Python zero-config routing behavior didn't match either the
+# documented convention or our explicit vercel.json rewrite cleanly, so
+# rather than keep guessing, all plausible real paths point at the same
+# handler. Whichever one turns out to be live, it works.
+app.post("/chat/completions")(_handle_chat_completions)
+app.post("/api/chat/completions")(_handle_chat_completions)
+app.post("/api/chat/completions/")(_handle_chat_completions)
