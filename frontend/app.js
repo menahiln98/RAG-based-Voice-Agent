@@ -13,14 +13,14 @@ const CONFIG = {
   // Your deployed FastAPI backend's base URL (the Vercel URL from /api).
   // Used here only for the text-input fallback -- Vapi calls this same
   // endpoint directly during real voice calls, this app doesn't proxy that.
-  API_BASE_URL: "https://your-backend.vercel.app",
+  API_BASE_URL: "https://rag-based-voice-agent.vercel.app",
 
   // From your Vapi dashboard: Settings -> API Keys -> Public Key.
-  VAPI_PUBLIC_KEY: "YOUR_VAPI_PUBLIC_KEY",
+  VAPI_PUBLIC_KEY: "b1effba0-0535-42f5-bf10-a593cecbc6df",
 
   // The assistant ID you create in the Vapi dashboard, configured with
   // Custom LLM pointing at this same backend's /chat/completions endpoint.
-  VAPI_ASSISTANT_ID: "YOUR_VAPI_ASSISTANT_ID",
+  VAPI_ASSISTANT_ID: "f72317fb-8f57-4b16-880b-dddb7d324c2a",
 };
 
 // ---------------------------------------------------------------------------
