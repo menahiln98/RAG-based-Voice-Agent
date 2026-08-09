@@ -10,6 +10,7 @@ the honest answer is a specific number. Not set to 0.0 because a small
 amount of variability keeps phrasing natural for a voice response rather
 than robotic/repetitive across similar queries.
 """
+import json
 import requests
 
 from config import GROQ_API_KEY, GROQ_MODEL, GENERATION_TEMPERATURE
@@ -38,23 +39,22 @@ def build_context(chunks: list[dict]) -> str:
     return "\n\n".join(f"[Source: {c['source_file']}]\n{c['text']}" for c in chunks)
 
 
-def generate_answer(query: str, chunks: list[dict], is_grounded: bool) -> str:
-    if not is_grounded:
-        context = "No sufficiently relevant information was found for this query."
-    else:
-        context = build_context(chunks)
-
-    messages = [
+def _build_messages(query: str, chunks: list[dict], is_grounded: bool) -> list[dict]:
+    context = build_context(chunks) if is_grounded else "No sufficiently relevant information was found for this query."
+    return [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"},
     ]
 
+
+def generate_answer(query: str, chunks: list[dict], is_grounded: bool) -> str:
+    """Non-streaming: waits for the full answer, then returns it as one string."""
     response = requests.post(
         GROQ_URL,
         headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
         json={
             "model": GROQ_MODEL,
-            "messages": messages,
+            "messages": _build_messages(query, chunks, is_grounded),
             "temperature": GENERATION_TEMPERATURE,
             "max_tokens": 300,  # keep responses short -- this gets spoken aloud
         },
@@ -62,3 +62,43 @@ def generate_answer(query: str, chunks: list[dict], is_grounded: bool) -> str:
     )
     response.raise_for_status()
     return response.json()["choices"][0]["message"]["content"].strip()
+
+
+def generate_answer_stream(query: str, chunks: list[dict], is_grounded: bool):
+    """
+    Streaming: yields text deltas as they arrive from Groq, instead of
+    waiting for the full answer. This is what lets Vapi start speaking
+    the first few words while the rest of the answer is still being
+    generated -- critical for perceived latency in a voice agent, since
+    the full retrieve->rerank->generate pipeline takes a few seconds and
+    a caller waiting in total silence that long will often just hang up
+    before a non-streaming response ever arrives.
+    """
+    response = requests.post(
+        GROQ_URL,
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+        json={
+            "model": GROQ_MODEL,
+            "messages": _build_messages(query, chunks, is_grounded),
+            "temperature": GENERATION_TEMPERATURE,
+            "max_tokens": 300,
+            "stream": True,
+        },
+        timeout=30,
+        stream=True,
+    )
+    response.raise_for_status()
+
+    for line in response.iter_lines():
+        if not line:
+            continue
+        line = line.decode("utf-8")
+        if not line.startswith("data: "):
+            continue
+        payload = line[len("data: "):]
+        if payload.strip() == "[DONE]":
+            return
+        chunk = json.loads(payload)
+        delta = chunk["choices"][0]["delta"].get("content")
+        if delta:
+            yield delta
